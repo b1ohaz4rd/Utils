@@ -1,3 +1,5 @@
+-- Credits to RIP#6666
+
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 if not _G.Settings then
@@ -108,8 +110,8 @@ local function CheckIfBad(Instance)
     if not Instance:IsDescendantOf(Players) and not PartOfCharacter(Instance) then
         if Instance:IsA("DataModelMesh") then
             if _G.Settings.Meshes.LowDetail then
-                sethiddenproperty(Instance, "LODX", Enum.LevelOfDetailSetting.Low)
-                sethiddenproperty(Instance, "LODY", Enum.LevelOfDetailSetting.Low)
+                --sethiddenproperty(Instance, "LODX", Enum.LevelOfDetailSetting.Low)
+                --sethiddenproperty(Instance, "LODY", Enum.LevelOfDetailSetting.Low)
             elseif _G.Settings.Meshes.Destroy then
                 Instance:Destroy()
             end
