@@ -124,7 +124,7 @@ function API:AbbreviateNumber(Number)
         FormattedNumber = string.format("%d", Number)
     else
         local Thresholds = {}
-        for _, Threshold in next, Abbreviations do
+        for Threshold in next, Abbreviations do
           table.insert(Thresholds, Threshold)
         end
         table.sort(Thresholds, function(a, b) return a > b end)
