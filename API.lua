@@ -5,26 +5,28 @@ function API:Services(Service)
     return game:GetService(Service)
 end
 
+function API:GetPlayerHeadshot()
+    local Request = (syn and syn.request or http_request or request){
+        Url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="..game.Players.LocalPlayer.UserId.."&size=720x720&format=Png&isCircular=false"
+    }
+    local HttpService = game:GetService("HttpService")
+    local Body = HttpService:JSONDecode(Request.Body)
+    return Body.data[1].imageUrl
+end
+
 function API:Webhook(Url, Data)
-    (syn and syn.request or http_request or request)({
+    (syn and syn.request or http_request or request){
         Url = Url,
-        Method = "POST", 
+        Method = "POST",
         Headers = {["Content-Type"] = "application/json"},
         Body = game:GetService("HttpService"):JSONEncode(Data)
-    })
+    }
 end
 
 function API:VirtualPressButton(Button)
     game:GetService("VirtualInputManager"):SendKeyEvent(true, Button, false, nil)
     task.wait()
     game:GetService("VirtualInputManager"):SendKeyEvent(false, Button, false, nil)
-end
-
-function API:GetPlayerHeadshot()
-    local req = (syn and syn.request or http_request or request)({Url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="..game.Players.LocalPlayer.UserId.."&size=720x720&format=Png&isCircular=false"})
-    local HttpService = game:GetService("HttpService")
-    local Body = HttpService:JSONDecode(req.Body)
-    return Body.data[1].imageUrl
 end
 
 function API:RobloxNotify(Title, Description, Duration)
