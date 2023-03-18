@@ -1,8 +1,12 @@
 local API = {}
 
-function API:Services(Service)
-    if not game:GetService(Service) then return end
-    return game:GetService(Service)
+function API:Load()
+    API.Services = {}
+    setmetatable(API.Services, {
+        __index = function(_, Service_Name)
+            return game:GetService(Service_Name)
+        end
+    })
 end
 
 function API:GetPlayerHeadshot()
