@@ -59,15 +59,16 @@ function API:Humanoid()
     return self:Character():WaitForChild("Humanoid")
 end
 
-function API:Tween(Time, Object)
+function API:Tween(Time, Object, Studs)
     pcall(function()
-        Time = (self:Root().Position - Object).Magnitude / Time
+        Studs = Studs or false
+        if Studs then Time = (self:Root().Position - Object).Magnitude / Time end
         game:GetService("TweenService"):Create(self:Root(), TweenInfo.new(Time, Enum.EasingStyle.Linear), { CFrame = CFrame.new(Object) }):Play()
         task.wait(Time)
     end)
 end
 
-function API:Pathfind(Destination)
+function API:Pathfind(Destination, Speed)
     local Path = game:GetService("PathfindingService"):CreatePath({ AgentCanJump = true, AgentCanClimb = true })
 
     local Success, ErrorMessage = pcall(function()
@@ -94,7 +95,7 @@ function API:Pathfind(Destination)
         end
     else
         warn(ErrorMessage)
-        self:Tween(100, Destination)
+        self:Tween(Speed, Destination)
     end
 end
 
