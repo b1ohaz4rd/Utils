@@ -146,7 +146,7 @@ function API:AbbreviateNumber(Number)
     return FormattedNumber
 end
 
-function API:Create(Class, Properties)
+--[[function API:Create(Class, Properties)
     local _Instance = Class
 
     if type(Class) == 'string' then
@@ -158,6 +158,6 @@ function API:Create(Class, Properties)
     end
 
     return _Instance
-end
+end]]
 
 return API
