@@ -146,4 +146,18 @@ function API:AbbreviateNumber(Number)
     return FormattedNumber
 end
 
+function API:Create(Class, Properties)
+    local _Instance = Class
+
+    if type(Class) == 'string' then
+        _Instance = Instance.new(Class)
+    end
+
+    for Property, Value in next, Properties do
+        _Instance[Property] = Value
+    end
+
+    return _Instance
+end
+
 return API
