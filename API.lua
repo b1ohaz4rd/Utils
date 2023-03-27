@@ -59,9 +59,17 @@ function API:Humanoid()
     return self:Character():WaitForChild("Humanoid")
 end
 
+function API:Teleport(CFrame)
+    self:Root().CFrame = CFrame
+end
+
+function API:Magnitude(Pos1, Pos2)
+    return (Pos1 - Pos2).Magnitude
+end
+
 function API:Tween(Object, Studs)
     pcall(function()
-        local Time = (self:Root().Position - Object).Magnitude / Studs
+        local Time = self:Magnitude(self:Root(), Object) / Studs
         local Tween = game:GetService("TweenService"):Create(self:Root(), TweenInfo.new(Time, Enum.EasingStyle.Linear), { CFrame = CFrame.new(Object) })
         Tween:Play()
         Tween.Completed:Wait()
@@ -97,14 +105,6 @@ function API:Pathfind(Destination, Speed)
         warn(ErrorMessage)
         self:Tween(Speed, Destination)
     end
-end
-
-function API:Teleport(CFrame)
-    self:Root().CFrame = CFrame
-end
-
-function API:Magnitude(Pos1, Pos2)
-    return (Pos1 - Pos2).Magnitude
 end
 
 function API:FormatSeconds(Seconds)
