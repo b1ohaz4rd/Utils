@@ -59,12 +59,12 @@ function API:Humanoid()
     return self:Character():WaitForChild("Humanoid")
 end
 
-function API:Tween(Time, Object, Studs)
+function API:Tween(Object, Studs)
     pcall(function()
-        Studs = Studs or false
-        if Studs then Time = (self:Root().Position - Object).Magnitude / Time end
-        game:GetService("TweenService"):Create(self:Root(), TweenInfo.new(Time, Enum.EasingStyle.Linear), { CFrame = CFrame.new(Object) }):Play()
-        task.wait(Time)
+        local Time = (self:Root().Position - Object).Magnitude / Studs
+        local Tween = game:GetService("TweenService"):Create(self:Root(), TweenInfo.new(Time, Enum.EasingStyle.Linear), { CFrame = CFrame.new(Object) })
+        Tween:Play()
+        Tween.Completed:Wait()
     end)
 end
 
