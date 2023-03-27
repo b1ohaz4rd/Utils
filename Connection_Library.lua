@@ -38,9 +38,7 @@ function ConnectionLibrary:ClearConnections()
 end
 
 function ConnectionLibrary:Destroy()
-    if ( #self.Connections > 0 ) then
-        self:ClearConnections()
-    end
+    self:ClearConnections()
 
     setmetatable(self, nil)
 end
