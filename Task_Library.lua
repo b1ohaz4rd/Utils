@@ -18,7 +18,7 @@ function TaskLibrary:Get(ID)
     return self.Tasks[ID]
 end
 
-function TaskLibrary:Disconnect(ID)
+function TaskLibrary:Cancel(ID)
     local Tasks = self.Tasks
 
     task.cancel(Tasks[ID])
