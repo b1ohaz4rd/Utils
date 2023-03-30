@@ -160,4 +160,8 @@ function API:Create(Class, Properties)
     return _Instance
 end
 
+function API:IsVisible(Part, Ignore)
+    return (#workspace.CurrentCamera:GetPartsObscuringTarget({ Part.Position }, { Ignore }) == 0)
+end
+
 return API
