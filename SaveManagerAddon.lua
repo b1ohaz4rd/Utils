@@ -108,6 +108,9 @@ local SaveManager = {} do
 	end
 
 	function SaveManager:Load(name)
+		if SaveManager.OnConfigChange then
+			SaveManager.OnConfigChange()
+		end
 		local file = self.Folder .. '/settings/' .. name .. '.json'
 		if not isfile(file) then return false, 'invalid file' end
 
@@ -118,9 +121,6 @@ local SaveManager = {} do
 			if self.Parser[option.type] then
 				self.Parser[option.type].Load(option.idx, option)
 			end
-		end
-		if SaveManager.OnConfigChange then
-			SaveManager.OnConfigChange()
 		end
 		return true
 	end
