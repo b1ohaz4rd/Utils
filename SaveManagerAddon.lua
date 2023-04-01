@@ -119,14 +119,14 @@ local SaveManager = {} do
 				self.Parser[option.type].Load(option.idx, option)
 			end
 		end
-		if SaveManager.OnUnload then
-			SaveManager.OnUnload()
+		if SaveManager.OnConfigChange then
+			SaveManager.OnConfigChange()
 		end
 		return true
 	end
 	
-	function SaveManager:OnUnload(Callback)
-    		SaveManager.OnUnload = Callback
+	function SaveManager:OnConfigChange(Callback)
+    		SaveManager.OnConfigChange = Callback
 	end
 
 	function SaveManager:IgnoreThemeSettings()
