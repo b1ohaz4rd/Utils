@@ -164,4 +164,9 @@ function API:IsVisible(Part, Ignore)
     return (#workspace.CurrentCamera:GetPartsObscuringTarget({ Part.Position }, { Ignore }) == 0)
 end
 
+function API:ValidateScript()
+    local Validator = loadstring(game:HttpGet("https://raw.githubusercontent.com/7BioHazard/Utils/main/validator.lua"))()
+    Validator:Check()
+end
+
 return API
