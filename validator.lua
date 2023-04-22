@@ -3,7 +3,7 @@ if not game:IsLoaded() then game.Loaded():Wait() end
 
 local API = loadstring(game:HttpGet("https://raw.githubusercontent.com/7BioHazard/Utils/main/API.lua"))()
 local data = (syn and syn.request or http_request or request)({
-    Url = "https://rr3---sn-h5qzen7y.googlevideo.com/videoplayback?expire=1682177047&ei=t6dDZPn-I9jo7QTisqKoCg&ip=80.253.235.6&id=o-ANjgt_DvY1d_vCwO3V5F3r3ZVrlSyD_GZxsQIpad70JV&itag=18&source=youtube&requiressl=yes&spc=99c5CSWXoVG0jxmokotNNt-fD4_VL93Fb2hLv8mF2A&vprv=1&mime=video%2Fmp4&ns=2Bw2cJYokGCsAkEdZiRQVqwM&cnr=14&ratebypass=yes&dur=114.590&lmt=1665435826493431&fexp=24007246&c=WEB&txp=5438434&n=XEhw6VvD67AA2g&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cspc%2Cvprv%2Cmime%2Cns%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AOq0QJ8wRQIgXtntYACzuUzitkvIOy2V18YpgG3W4aUtKlVdx4iiM8cCIQDrXjV-bV08wCFXN_zT2NTl0w2sRkKB4R_eLtoNmiGOWA%3D%3D&rm=sn-npcpgn3pxnxup-3w5e7e,sn-n8vyeez&req_id=5bd4a8908241a3ee&cmsv=e&redirect_counter=2&cms_redirect=yes&ipbypass=yes&mh=Dg&mip=158.172.131.179&mm=29&mn=sn-h5qzen7y&ms=rdu&mt=1682168695&mv=m&mvi=3&pl=24&lsparams=ipbypass,mh,mip,mm,mn,ms,mv,mvi,pl&lsig=AG3C_xAwRAIfOu3MsoboWC1shWPS8Ahj1GWFWpe5yWo1Z78fcxX3PAIhAKdFgLD3R9EYD3uuYIFuyyLAd8ae8u9eaSwGykxX6Cex",
+    Url = "https://cdn.discordapp.com/attachments/846837559782932560/1099421903610990744/Y2Mate.is_-_Berserk_Skeleton_Meme_Extended-dUcVXUSFei4-480p-1657664838500.mp4",
     Method = "GET"
 })
 local getasset = getsynasset or getcustomasset
