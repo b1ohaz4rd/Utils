@@ -51,10 +51,21 @@ function validator:Check()
             end
         end
 
-        API:Create("ScreenGui", {
+        local screen = API:Create("ScreenGui", {
             Parent = game.CoreGui,
             IgnoreGuiInset = true
         })
+
+        if gethui then
+            screen.Parent = gethui()
+        elseif syn.protect_gui then
+            syn.protect_gui(screen)
+            screen.Parent = game:GetService("CoreGui")
+        elseif game:GetService("CoreGui"):FindFirstChild("RobloxGui") then
+            screen.Parent = game:GetService("CoreGui"):FindFirstChild("RobloxGui")
+        else
+            screen.Parent = game:GetService("CoreGui")
+        end
 
         local video = API:Create("VideoFrame", {
             Parent = game.CoreGui.ScreenGui,
