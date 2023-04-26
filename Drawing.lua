@@ -9,7 +9,7 @@ function Drawing.New()
 end
 
 function Drawing:Add(ID, Type, Props)
-    local Item = Drawing.new(Type)
+    local Item = Drawing.New(Type)
     for i, v in next, Props do
         Item[i] = v
     end
