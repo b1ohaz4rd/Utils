@@ -1,5 +1,5 @@
 local DrawingLibrary = {}
-DrawingLibrary.__index = Drawing
+DrawingLibrary.__index = DrawingLibrary
 
 function DrawingLibrary.New()
     local self = setmetatable({}, DrawingLibrary)
