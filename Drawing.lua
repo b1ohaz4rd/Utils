@@ -17,6 +17,10 @@ function DrawingLibrary:Add(ID, Type, Props)
     return Item
 end
 
+function DrawingLibrary:Get(ID)
+    return self.Cache[ID]
+end
+
 function DrawingLibrary:Delete(ID)
     self.Cache[ID]:Remove()
     self.Cache[ID] = nil
