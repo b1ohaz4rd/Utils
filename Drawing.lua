@@ -21,6 +21,12 @@ function DrawingLibrary:Get(ID)
     return self.Cache[ID]
 end
 
+function DrawingLibrary:Set(ID, NewVals)
+    for i, v in next, NewVals do
+        self.Cache[ID][i] = v
+    end
+end
+
 function DrawingLibrary:Delete(ID)
     self.Cache[ID]:Remove()
     self.Cache[ID] = nil
