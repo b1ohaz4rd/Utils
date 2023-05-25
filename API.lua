@@ -1,5 +1,23 @@
 local API = {}
 
+local oldTraceback
+oldTraceback = hookfunction(getrenv().debug.traceback, function(lol)
+    local traceback = oldTraceback(lol)
+    if checkcaller() then
+        local a = traceback:split("\n")
+        return string.format("%s\n%s\n", a[1], a[3])
+    end
+    return traceback
+end)
+
+local oldInfo
+oldInfo = hookfunction(getrenv().debug.info, function(lvl, a)
+    if checkcaller() then
+        return oldInfo(3, a)
+    end
+    return oldInfo(lvl, a)
+end)
+
 function API:Load()
     API.Services = {}
     setmetatable(API.Services, {
@@ -10,7 +28,7 @@ function API:Load()
 end
 
 function API:GetPlayerHeadshot()
-    local Request = (syn and syn.request or http_request or request){
+    local Request = ((syn and syn.request) or (http and http.request) or http_request or function() end){
         Url = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="..game.Players.LocalPlayer.UserId.."&size=720x720&format=Png&isCircular=false"
     }
     local HttpService = game:GetService("HttpService")
@@ -19,7 +37,7 @@ function API:GetPlayerHeadshot()
 end
 
 function API:Webhook(Url, Data)
-    (syn and syn.request or http_request or request){
+    ((syn and syn.request) or (http and http.request) or http_request or function() end){
         Url = Url,
         Method = "POST",
         Headers = {["Content-Type"] = "application/json"},
@@ -43,60 +61,53 @@ function API:RobloxNotify(Title, Description, Duration)
     end)
 end
 
-function API:Player()
-    return game:GetService("Players").LocalPlayer
-end
+function API:Tween(vec3, speed)
+    assert(typeof(vec3) == "Vector3", "Argument #1 must be a Vector3")
+    assert(typeof(speed) == "number", "Argument #2 must be a number")
 
-function API:Character()
-    return self:Player().Character
-end
+    local dist = game.Players.LocalPlayer:DistanceFromCharacter(vec3)
+    local info = TweenInfo.new(dist / speed, Enum.EasingStyle.Linear)
 
-function API:Root()
-    return self:Character():WaitForChild("HumanoidRootPart")
-end
+    local tween = game.TweenService:Create(self:Root(), info, { CFrame = CFrame.new(vec3) })
+    tween:Play()
 
-function API:Humanoid()
-    return self:Character():WaitForChild("Humanoid")
-end
-
-function API:Teleport(CFrame)
-    self:Root().CFrame = CFrame
-end
-
-function API:Magnitude(Pos1, Pos2)
-    return (Pos1 - Pos2).Magnitude
-end
-
-function API:Tween(Object, Studs)
-    pcall(function()
-        local Time = self:Magnitude(self:Root(), Object) / Studs
-        local Tween = game:GetService("TweenService"):Create(self:Root(), TweenInfo.new(Time, Enum.EasingStyle.Linear), { CFrame = CFrame.new(Object) })
-        Tween:Play()
-        Tween.Completed:Wait()
+    local conn = game.RunService.RenderStepped:Connect(function()
+        game.Players.LocalPlayer.Character.PrimaryPart.Velocity = Vector3.zero
+        for _, v in next, game.Players.LocalPlayer.Character:GetDescendants() do
+            if v:IsA("BasePart") and v.CanCollide == true then
+                v.CanCollide = false
+            end
+        end
     end)
+
+    tween.Completed:Connect(function()
+        conn:Disconnect()
+    end)
+
+    return tween
 end
 
 function API:Pathfind(Destination, Speed)
-    local Path = game:GetService("PathfindingService"):CreatePath({ AgentCanJump = true, AgentCanClimb = true })
+    local Path = game.PathfindingService:CreatePath({ AgentCanJump = true, AgentCanClimb = true })
 
     local Success, ErrorMessage = pcall(function()
-        Path:ComputeAsync(self:Root().Position, Destination)
+        Path:ComputeAsync(game.Players.LocalPlayer.Character.PrimaryPart.Position, Destination)
     end)
 
     if Success and Path.Status == Enum.PathStatus.Success then
         local Waypoints = Path:GetWaypoints()
 
         for _, Waypoint in next, Waypoints do
-            if self:Humanoid().Health <= 0 then
+            if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid").Health <= 0 then
                 break
             end
             if Waypoint.Action == Enum.PathWaypointAction.Jump then
-                self:Humanoid().Jump = true
+                game.Players.LocalPlayer.Character:FindFirstChild("Humanoid").Jump = true
             end
-            repeat task.wait() self:Humanoid():MoveTo(Waypoint.Position) until self:Humanoid().MoveToFinished
-            local TimeOut = self:Humanoid().MoveToFinished:Wait(0.1)
+            repeat task.wait() game.Players.LocalPlayer.Character:FindFirstChild("Humanoid"):MoveTo(Waypoint.Position) until game.Players.LocalPlayer.Character:FindFirstChild("Humanoid").MoveToFinished
+            local TimeOut = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid").MoveToFinished:Wait(0.1)
             if not TimeOut then
-                self:Humanoid().Jump = true
+                game.Players.LocalPlayer.Character:FindFirstChild("Humanoid").Jump = true
                 self:Pathfind(Destination)
                 break
             end
@@ -164,9 +175,59 @@ function API:IsVisible(Part, Ignore)
     return (#workspace.CurrentCamera:GetPartsObscuringTarget({ Part.Position }, { Ignore }) == 0)
 end
 
-function API:ValidateScript()
-    local Validator = loadstring(game:HttpGet("https://raw.githubusercontent.com/7BioHazard/Utils/main/validator.lua"))()
-    Validator:Check()
+function API:SecureCall(Function, Script, ...)
+    if syn and syn.toast_notification then
+
+        local Info = debug.getinfo(Function)
+        local Options = {
+            script = Script,
+            identity = 2,
+            env = getsenv(Script),
+            thread = getscriptthread and getscriptthread(Script)
+        }
+        local Callstack = {Info}
+
+        return syn.trampoline_call(Function, Callstack, Options, ...)
+    elseif syn then
+        return syn.secure_call(Function, Script, ...)
+    elseif Krnl then
+        return coroutine.wrap(function(...)
+            setthreadcontext(2)
+            setfenv(0, getsenv(Script))
+            setfenv(1, getsenv(Script))
+            return Function(...)
+        end)(...)
+    elseif identifyexecutor and string.match(identifyexecutor(), "ScriptWare") then
+        local func, env = Function, Script
+        local functype, envtype = typeof(func), typeof(env)
+        local envclass = env.ClassName
+
+        assert(functype == "function", string.format("bad argument #1 to 'secure_call' (function expected, got %s)", functype))
+        assert(envtype == "Instance", string.format("bad argument #2 to 'secure_call' (Instance expected, got %s)", envtype))
+        assert(envclass == "LocalScript" or envclass == "ModuleScript", string.format("bad argument #2 to 'secure_call' (LocalScript or ModuleScript expected, got %s)", envclass))
+
+        local _, fenv = xpcall(function()
+            return getsenv(env)
+        end, function()
+            return getfenv(func)
+        end)
+
+        return coroutine.wrap(function(...)
+            setidentity(2)
+            setfenv(0, fenv)
+            setfenv(1, fenv)
+            return func(...)
+        end)(...)
+    elseif identifyexecutor and string.match(identifyexecutor(), "Fluxus") or identifyexecutor and string.match(identifyexecutor(), "Electron") then
+        return coroutine.wrap(function(...)
+            setthreadcontext(2)
+            setfenv(0, getsenv(Script))
+            setfenv(1, getsenv(Script))
+            return Function(...)
+        end)(...)
+    else
+        error("Unsupported executor")
+    end
 end
 
 return API
