@@ -1,24 +1,22 @@
 local API = {}
 
---[[
-    local oldTraceback
-    oldTraceback = hookfunction(getrenv().debug.traceback, function(lol)
-        local traceback = oldTraceback(lol)
-        if checkcaller() then
-            local a = traceback:split("\n")
-            return string.format("%s\n%s\n", a[1], a[3])
-        end
-        return traceback
-    end)
+local oldTraceback
+oldTraceback = hookfunction(getrenv().debug.traceback, function(lol)
+    local traceback = oldTraceback(lol)
+    if checkcaller() then
+        local a = traceback:split("\n")
+        return string.format("%s\n%s\n", a[1], a[3])
+    end
+    return traceback
+end)
 
-    local oldInfo
-    oldInfo = hookfunction(getrenv().debug.info, function(lvl, a)
-        if checkcaller() then
-            return oldInfo(3, a)
-        end
-        return oldInfo(lvl, a)
-    end)
-]]
+local oldInfo
+oldInfo = hookfunction(getrenv().debug.info, function(lvl, a)
+    if checkcaller() then
+        return oldInfo(3, a)
+    end
+    return oldInfo(lvl, a)
+end)
 
 function API:Load()
     API.Services = {}
@@ -177,61 +175,59 @@ function API:IsVisible(Part, Ignore)
     return (#workspace.CurrentCamera:GetPartsObscuringTarget({ Part.Position }, { Ignore }) == 0)
 end
 
---[[
-    function API:SecureCall(Function, Script, ...)
-        if syn and syn.toast_notification then
+function API:SecureCall(Function, Script, ...)
+    if syn and syn.toast_notification then
 
-            local Info = debug.getinfo(Function)
-            local Options = {
-                script = Script,
-                identity = 2,
-                env = getsenv(Script),
-                thread = getscriptthread and getscriptthread(Script)
-            }
-            local Callstack = {Info}
+        local Info = debug.getinfo(Function)
+        local Options = {
+            script = Script,
+            identity = 2,
+            env = getsenv(Script),
+            thread = getscriptthread and getscriptthread(Script)
+        }
+        local Callstack = {Info}
 
-            return syn.trampoline_call(Function, Callstack, Options, ...)
-        elseif syn then
-            return syn.secure_call(Function, Script, ...)
-        elseif Krnl then
-            return coroutine.wrap(function(...)
-                setthreadcontext(2)
-                setfenv(0, getsenv(Script))
-                setfenv(1, getsenv(Script))
-                return Function(...)
-            end)(...)
-        elseif identifyexecutor and string.match(identifyexecutor(), "ScriptWare") then
-            local func, env = Function, Script
-            local functype, envtype = typeof(func), typeof(env)
-            local envclass = env.ClassName
+        return syn.trampoline_call(Function, Callstack, Options, ...)
+    elseif syn then
+        return syn.secure_call(Function, Script, ...)
+    elseif Krnl then
+        return coroutine.wrap(function(...)
+            setthreadcontext(2)
+            setfenv(0, getsenv(Script))
+            setfenv(1, getsenv(Script))
+            return Function(...)
+        end)(...)
+    elseif identifyexecutor and string.match(identifyexecutor(), "ScriptWare") then
+        local func, env = Function, Script
+        local functype, envtype = typeof(func), typeof(env)
+        local envclass = env.ClassName
 
-            assert(functype == "function", string.format("bad argument #1 to 'secure_call' (function expected, got %s)", functype))
-            assert(envtype == "Instance", string.format("bad argument #2 to 'secure_call' (Instance expected, got %s)", envtype))
-            assert(envclass == "LocalScript" or envclass == "ModuleScript", string.format("bad argument #2 to 'secure_call' (LocalScript or ModuleScript expected, got %s)", envclass))
+        assert(functype == "function", string.format("bad argument #1 to 'secure_call' (function expected, got %s)", functype))
+        assert(envtype == "Instance", string.format("bad argument #2 to 'secure_call' (Instance expected, got %s)", envtype))
+        assert(envclass == "LocalScript" or envclass == "ModuleScript", string.format("bad argument #2 to 'secure_call' (LocalScript or ModuleScript expected, got %s)", envclass))
 
-            local _, fenv = xpcall(function()
-                return getsenv(env)
-            end, function()
-                return getfenv(func)
-            end)
+        local _, fenv = xpcall(function()
+            return getsenv(env)
+        end, function()
+            return getfenv(func)
+        end)
 
-            return coroutine.wrap(function(...)
-                setidentity(2)
-                setfenv(0, fenv)
-                setfenv(1, fenv)
-                return func(...)
-            end)(...)
-        elseif identifyexecutor and string.match(identifyexecutor(), "Fluxus") or identifyexecutor and string.match(identifyexecutor(), "Electron") then
-            return coroutine.wrap(function(...)
-                setthreadcontext(2)
-                setfenv(0, getsenv(Script))
-                setfenv(1, getsenv(Script))
-                return Function(...)
-            end)(...)
-        else
-            error("Unsupported executor")
-        end
+        return coroutine.wrap(function(...)
+            setidentity(2)
+            setfenv(0, fenv)
+            setfenv(1, fenv)
+            return func(...)
+        end)(...)
+    elseif identifyexecutor and string.match(identifyexecutor(), "Fluxus") or identifyexecutor and string.match(identifyexecutor(), "Electron") then
+        return coroutine.wrap(function(...)
+            setthreadcontext(2)
+            setfenv(0, getsenv(Script))
+            setfenv(1, getsenv(Script))
+            return Function(...)
+        end)(...)
+    else
+        error("Unsupported executor")
     end
-]]
+end
 
 return API
